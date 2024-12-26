@@ -19,6 +19,7 @@ import com.example.mystoryapp.data.retrofit.ApiConfig
 import com.example.mystoryapp.databinding.ActivityMainBinding
 import com.example.mystoryapp.ui.main.main2.ViewModelFactory
 import com.example.mystoryapp.ui.main.main2.WelcomeActivity
+import com.example.mystoryapp.ui.maps.MapsActivity
 import com.example.mystoryapp.ui.story.UploadStoryActivity
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -107,6 +108,10 @@ class MainActivity : AppCompatActivity() {
                 showLogoutDialog()
                 true
             }
+            R.id.map -> {
+                startActivity(Intent(this, MapsActivity::class.java))
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -145,6 +150,7 @@ class MainActivity : AppCompatActivity() {
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
+
 
     companion object {
         private const val TAG = "MainActivity"

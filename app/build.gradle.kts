@@ -20,6 +20,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "BASE_URL", "\"https://story-api.dicoding.dev/v1\"")
+
+
     }
 
     buildTypes {
@@ -41,6 +43,9 @@ android {
     buildFeatures {
         viewBinding = true
         buildConfig = true
+    }
+    kapt {
+        correctErrorTypes = true
     }
 }
 
@@ -83,6 +88,7 @@ dependencies {
     testImplementation(libs.mockito.inline)
 
     implementation (libs.timber)
+
 
     implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-compiler:2.48")

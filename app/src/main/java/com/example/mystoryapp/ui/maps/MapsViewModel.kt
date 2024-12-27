@@ -10,6 +10,7 @@ import com.example.mystoryapp.data.response.ListStoryItem
 import com.example.mystoryapp.ui.auth.NetworkResult
 import kotlinx.coroutines.launch
 
+@HiltViewModel
 class MapsViewModel(private val storyRepository: StoryManager) : ViewModel() {
     private val _listStories = MutableLiveData<List<ListStoryItem>>()
     val listStories: LiveData<List<ListStoryItem>> = _listStories

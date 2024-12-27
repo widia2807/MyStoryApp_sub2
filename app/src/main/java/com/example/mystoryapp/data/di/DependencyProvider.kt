@@ -22,4 +22,5 @@ object DependencyProvider {
         val apiClient = ApiConfig.getApiService()
         return StoryManager.createInstance(apiClient, userPreferences)
     }
+
 }

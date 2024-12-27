@@ -1,5 +1,6 @@
 package com.example.mystoryapp.data.repo
 
+import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -57,6 +58,15 @@ class StoryManager private constructor(
             ),
             pagingSourceFactory = { StoryDataSource(api, preferences) }
         ).flow
+    }
+    suspend fun getStoriesLocation(): StoryResponse? {
+        val token = sharedPref.getString("token", null)
+        if (token != null) {
+            return api.getStoriesLocation("Bearer $token")
+        } else {
+            Log.e("StoryRepo", "tokennya null ")
+            return null
+           }
     }
 
     companion object {

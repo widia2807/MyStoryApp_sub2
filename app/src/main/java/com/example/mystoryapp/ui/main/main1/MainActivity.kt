@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         Timber.d("Setting up observers in MainActivity")
         viewModel.getSession().observe(this) { user ->
             Timber.d("Session state in MainActivity: isLogin=${user.isLogin}, tokenBlank=${user.token.isBlank()}")
-            if (!user.isLogin && user.token.isBlank()) {  // Changed condition to AND
+            if (!user.isLogin && user.token.isBlank()) {
                 Timber.d("No valid session found, navigating to Welcome")
                 navigateToWelcome()
             } else {

@@ -67,6 +67,12 @@ interface ApiService {
         @Path("id") id: String
     ): DetailStoryResponse
 
+    @GET("stories")
+    suspend fun getStoriesLocation(
+        @Header("Authorization") authToken: String,
+        @Query("location") location : Int = 1
+    ): StoryResponse
+
     companion object {
         private const val BASE_URL = "https://story-api.dicoding.dev/v1/"
     }

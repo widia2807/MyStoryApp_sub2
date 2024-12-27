@@ -26,12 +26,14 @@ class MapsViewModel(private val storyRepository: StoryManager) : ViewModel() {
 
     fun getStories() {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 val response = storyRepository.fetchAllStories()
-                if (response.listStory != null) {
-                    _listStories.value = response.listStory
+                response.listStory?.let { stories ->
+                    val nonNullStories = stories.filterNotNull()
+                    _listStories.value = nonNullStories
                     Log.d("MapsViewModel", "Stories fetched successfully")
-                } else {
+                } ?: run {
                     _error.value = "No stories available"
                     Log.e("MapsViewModel", "Story list is null")
                 }
@@ -41,17 +43,19 @@ class MapsViewModel(private val storyRepository: StoryManager) : ViewModel() {
             } catch (e: Exception) {
                 _error.value = "Error: ${e.message}"
                 Log.e("MapsViewModel", "Error fetching stories: ${e.message}")
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
-    // Alternative implementation using Flow if you prefer using the getStories Flow method
     fun getStoriesWithFlow() {
         viewModelScope.launch {
             storyRepository.getStories("").collect { result ->
                 when (result) {
                     is NetworkResult.Success -> {
-                        _listStories.value = result.data
+                        val nonNullStories = result.data.filterNotNull()
+                        _listStories.value = nonNullStories
                         _isLoading.value = false
                     }
                     is NetworkResult.Loading -> {

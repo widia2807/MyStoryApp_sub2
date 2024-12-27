@@ -60,13 +60,18 @@ class StoryManager private constructor(
         ).flow
     }
     suspend fun getStoriesLocation(): StoryResponse? {
-        val token = sharedPref.getString("token", null)
-        if (token != null) {
-            return api.getStoriesLocation("Bearer $token")
-        } else {
-            Log.e("StoryRepo", "tokennya null ")
-            return null
-           }
+        return try {
+            val session = preferences.getSession().firstOrNull()
+            if (session?.token != null) {
+                api.getStoriesLocation("Bearer ${session.token}")
+            } else {
+                Log.e("StoryRepo", "Token is null")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("StoryRepo", "Error getting stories location: ${e.message}")
+            null
+        }
     }
 
     companion object {

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.mystoryapp.data.di.DependencyProvider
+import com.example.mystoryapp.data.repo.StoryDatabase
 import com.example.mystoryapp.data.repo.UserManager
 import com.example.mystoryapp.data.retrofit.ApiService
 import com.example.mystoryapp.data.userpref.UserPreference
@@ -45,16 +46,19 @@ class ViewModelFactory private constructor(
 
         fun getInstance(context: Context, apiService: ApiService): ViewModelFactory {
             this.context = context.applicationContext
+
+
+            val database = StoryDatabase.getInstance(context)
+
             return instance ?: synchronized(this) {
                 instance ?: ViewModelFactory(
                     DependencyProvider.createUserRepository(context, apiService),
-                    DependencyProvider.createStoryRepository(context)
+                    DependencyProvider.createStoryRepository(
+                        context,
+                        database
+                    ) // Pastikan parameter sesuai
                 ).also { instance = it }
             }
-        }
-
-        fun resetInstance() {
-            instance = null
         }
     }
 }

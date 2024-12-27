@@ -11,6 +11,7 @@ import com.example.mystoryapp.data.userpref.dataStore
 import com.example.mystoryapp.ui.auth.LoginViewModel
 import com.example.mystoryapp.ui.auth.RegisterViewModel
 import com.example.mystoryapp.ui.main.main1.MainViewModel
+import com.example.mystoryapp.ui.maps.MapsViewModel
 
 
 class ViewModelFactory private constructor(
@@ -29,6 +30,9 @@ class ViewModelFactory private constructor(
             }
             modelClass.isAssignableFrom(MainViewModel::class.java) -> {
                 MainViewModel(userManager, storyManager) as T
+            }
+            modelClass.isAssignableFrom(MainViewModel::class.java) -> {
+                MapsViewModel(storyManager) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

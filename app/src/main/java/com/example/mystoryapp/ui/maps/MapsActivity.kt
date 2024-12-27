@@ -20,6 +20,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import com.example.mystoryapp.R
 import com.example.mystoryapp.data.response.ListStoryItem
+import com.example.mystoryapp.data.retrofit.ApiConfig
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -27,6 +28,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.mystoryapp.databinding.ActivityMapsBinding
+import com.example.mystoryapp.ui.main.main2.ViewModelFactory
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLngBounds
@@ -36,7 +38,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
-    private val viewModel: MapsViewModel by viewModels()
+    private val viewModel: MapsViewModel by viewModels {
+        ViewModelFactory.getInstance(this, ApiConfig.getApiService())
+    }
     private val boundsBuilder = LatLngBounds.Builder()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,10 +63,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         viewModel.error.observe(this) { error ->
             Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
-        }
-
-        viewModel.isLoading.observe(this) { isLoading ->
-            binding.progressBar.isVisible = isLoading
         }
     }
 

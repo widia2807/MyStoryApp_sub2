@@ -10,9 +10,13 @@ import com.example.mystoryapp.data.response.ListStoryItem
 import com.example.mystoryapp.ui.auth.NetworkResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
-class MapsViewModel( private val storyRepository: StoryManager) : ViewModel() {
+class MapsViewModel @Inject constructor(
+    private val storyRepository: StoryManager
+) : ViewModel() {
+
     private val _listStories = MutableLiveData<List<ListStoryItem>>()
     val listStories: LiveData<List<ListStoryItem>> = _listStories
 
@@ -72,3 +76,4 @@ class MapsViewModel( private val storyRepository: StoryManager) : ViewModel() {
         }
     }
 }
+

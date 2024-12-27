@@ -15,6 +15,10 @@ import com.example.mystoryapp.data.retrofit.ApiService
 import com.example.mystoryapp.data.retrofit.StoryRemoteMediator
 import com.example.mystoryapp.data.userpref.UserPreference
 import com.example.mystoryapp.ui.auth.NetworkResult
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
@@ -103,4 +107,19 @@ class StoryManager private constructor(
             }
         }
     }
+
+    @Module
+    @InstallIn(ViewModelComponent::class)
+    object MapsModule {
+
+        @Provides
+        fun provideStoryManager(
+            api: ApiService,
+            preferences: UserPreference,
+            database: StoryDatabase
+        ): StoryManager {
+            return StoryManager(api, preferences, database)
+        }
+    }
+
 }

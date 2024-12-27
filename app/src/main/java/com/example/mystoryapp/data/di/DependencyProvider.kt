@@ -1,6 +1,7 @@
 package com.example.mystoryapp.data.di
 
 import android.content.Context
+import com.example.mystoryapp.data.repo.StoryDatabase
 import com.example.mystoryapp.data.repo.StoryManager
 import com.example.mystoryapp.data.repo.UserManager
 import com.example.mystoryapp.data.retrofit.ApiConfig
@@ -16,11 +17,12 @@ object DependencyProvider {
         return UserManager.createInstance(apiService, preferences)
     }
 
-    fun createStoryRepository(context: Context): StoryManager {
+    fun createStoryRepository(context: Context, database: StoryDatabase): StoryManager {
         val userPreferences = UserPreference.getInstance(context.dataStore)
         val userSession = runBlocking { userPreferences.getSession().first() }
         val apiClient = ApiConfig.getApiService()
-        return StoryManager.createInstance(apiClient, userPreferences)
+        return StoryManager.createInstance(apiClient, userPreferences, database)
     }
+
 
 }

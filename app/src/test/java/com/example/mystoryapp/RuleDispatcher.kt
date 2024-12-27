@@ -6,11 +6,12 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.runner.Description
+import org.junit.rules.TestWatcher
 
 class RuleDispatcher {
     private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
-}
-    ) : TestWatcher() {
+
+    inner class MainDispatcherRule : TestWatcher() {
         override fun starting(description: Description) {
             Dispatchers.setMain(testDispatcher)
         }
@@ -19,3 +20,6 @@ class RuleDispatcher {
             Dispatchers.resetMain()
         }
     }
+
+    val mainDispatcherRule = MainDispatcherRule()
+}

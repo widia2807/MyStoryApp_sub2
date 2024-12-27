@@ -3,9 +3,10 @@ package com.example.mystoryapp.data.repo
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
-import com.example.mystoryapp.data.DaoStory
-import com.example.mystoryapp.data.RemoteKeys
-import com.example.mystoryapp.data.RemoteKeysDao
+import androidx.room.RoomDatabase
+import com.example.mystoryapp.data.dao.DaoStory
+import com.example.mystoryapp.data.dao.RemoteKeys
+import com.example.mystoryapp.data.dao.RemoteKeysDao
 import com.example.mystoryapp.data.response.ListStoryItemLocal
 
 

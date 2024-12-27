@@ -16,6 +16,7 @@ import androidx.paging.AsyncPagingDataDiffer
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.example.mystoryapp.data.dao.ListStoriesAdapter
 import com.example.mystoryapp.data.repo.StoryManager
 import com.example.mystoryapp.data.response.ListStoryItemLocal
 import com.example.mystoryapp.ui.main.main1.MainViewModel
@@ -28,7 +29,7 @@ class MainViewModelTest{
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
     @get:Rule
-    val mainDispatcherRules = MainDispatcherRule()
+    val mainDispatcherRules = RuleDispatcher.MainDispatcherRule()
     @Mock
     private lateinit var storyManager: StoryManager
     @Test

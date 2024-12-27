@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-parcelize")
+    id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
 }
 
@@ -81,4 +83,13 @@ dependencies {
     testImplementation(libs.mockito.inline)
 
     implementation (libs.timber)
+
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-compiler:2.48")
+
+
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.48")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.48")
+    testImplementation("com.google.dagger:hilt-android-testing:2.48")
+    kaptTest("com.google.dagger:hilt-android-compiler:2.48")
 }

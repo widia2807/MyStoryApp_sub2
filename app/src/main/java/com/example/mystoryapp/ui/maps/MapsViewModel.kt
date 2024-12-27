@@ -8,10 +8,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.mystoryapp.data.repo.StoryManager
 import com.example.mystoryapp.data.response.ListStoryItem
 import com.example.mystoryapp.ui.auth.NetworkResult
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class MapsViewModel(private val storyRepository: StoryManager) : ViewModel() {
+class MapsViewModel( private val storyRepository: StoryManager) : ViewModel() {
     private val _listStories = MutableLiveData<List<ListStoryItem>>()
     val listStories: LiveData<List<ListStoryItem>> = _listStories
 

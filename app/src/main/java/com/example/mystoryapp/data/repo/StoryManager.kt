@@ -6,8 +6,10 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.liveData
 import com.example.mystoryapp.data.response.DetailStoryResponse
 import com.example.mystoryapp.data.response.ListStoryItem
+import com.example.mystoryapp.data.response.ListStoryItemLocal
 import com.example.mystoryapp.data.response.StoryResponse
 import com.example.mystoryapp.data.retrofit.ApiService
 import com.example.mystoryapp.data.retrofit.StoryRemoteMediator
@@ -95,9 +97,9 @@ class StoryManager private constructor(
         @Volatile
         private var INSTANCE: StoryManager? = null
 
-        fun createInstance(api: ApiService, preferences: UserPreference): StoryManager {
+        fun createInstance(api: ApiService, preferences: UserPreference, database: StoryDatabase): StoryManager {
             return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: StoryManager(api, preferences).also { INSTANCE = it }
+                INSTANCE ?: StoryManager(api, preferences, database).also { INSTANCE = it }
             }
         }
     }

@@ -32,7 +32,7 @@ class ViewModelFactory private constructor(
             modelClass.isAssignableFrom(MainViewModel::class.java) -> {
                 MainViewModel(userManager, storyManager) as T
             }
-            modelClass.isAssignableFrom(MainViewModel::class.java) -> {
+            modelClass.isAssignableFrom(MapsViewModel::class.java) -> {
                 MapsViewModel(storyManager) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
@@ -47,16 +47,12 @@ class ViewModelFactory private constructor(
         fun getInstance(context: Context, apiService: ApiService): ViewModelFactory {
             this.context = context.applicationContext
 
-
             val database = StoryDatabase.getInstance(context)
 
             return instance ?: synchronized(this) {
                 instance ?: ViewModelFactory(
                     DependencyProvider.createUserRepository(context, apiService),
-                    DependencyProvider.createStoryRepository(
-                        context,
-                        database
-                    ) // Pastikan parameter sesuai
+                    DependencyProvider.createStoryRepository(context, database)
                 ).also { instance = it }
             }
         }

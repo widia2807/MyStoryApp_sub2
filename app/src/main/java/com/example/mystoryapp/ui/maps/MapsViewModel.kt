@@ -35,17 +35,16 @@ class MapsViewModel @Inject constructor(
             _isLoading.value = true
             try {
                 val response = storyRepository.fetchAllStories()
-                response.listStory?.let { stories ->
-                    val nonNullStories = stories.filterNotNull()
-                    _listStories.value = nonNullStories
+                if (!response.listStory.isNullOrEmpty()) {
+                    _listStories.value = response.listStory.filterNotNull()
                     Log.d("MapsViewModel", "Stories fetched successfully")
-                } ?: run {
+                } else {
                     _error.value = "No stories available"
-                    Log.e("MapsViewModel", "Story list is null")
+                    Log.e("MapsViewModel", "Story list is empty")
                 }
-            } catch (e: IllegalStateException) {
-                _error.value = "Authentication error: ${e.message}"
-                Log.e("MapsViewModel", "Auth error: ${e.message}")
+            } catch (e: Exception) {
+                _error.value = "Error: ${e.message}"
+                Log.e("MapsViewModel", "Error fetching stories: ${e.message}")
             } catch (e: Exception) {
                 _error.value = "Error: ${e.message}"
                 Log.e("MapsViewModel", "Error fetching stories: ${e.message}")

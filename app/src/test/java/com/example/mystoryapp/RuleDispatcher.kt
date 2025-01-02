@@ -5,21 +5,17 @@ import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
-import org.junit.runner.Description
 import org.junit.rules.TestWatcher
+import org.junit.runner.Description
 
-class RuleDispatcher {
+class MainDispatcherRule : TestWatcher() {
     private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
 
-    inner class MainDispatcherRule : TestWatcher() {
-        override fun starting(description: Description) {
-            Dispatchers.setMain(testDispatcher)
-        }
-
-        override fun finished(description: Description) {
-            Dispatchers.resetMain()
-        }
+    override fun starting(description: Description) {
+        Dispatchers.setMain(testDispatcher)
     }
 
-    val mainDispatcherRule = MainDispatcherRule()
+    override fun finished(description: Description) {
+        Dispatchers.resetMain()
+    }
 }

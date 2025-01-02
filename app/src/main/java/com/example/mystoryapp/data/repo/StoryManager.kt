@@ -48,9 +48,18 @@ class StoryManager private constructor(
     }
 
 
-    suspend fun fetchAllStories(): StoryResponse {
+    suspend fun fetchStoriesWithLocation(): StoryResponse {
         val authToken = preferences.getSession().firstOrNull()?.token
             ?: throw IllegalStateException("Authentication token is missing")
+        return api.getStories(token = "Bearer $authToken", location = 1)
+    }
+
+
+    suspend fun fetchAllStories(): StoryResponse {
+        val authToken = preferences.getSession().firstOrNull()?.token
+        if (authToken.isNullOrEmpty()) {
+            throw IllegalStateException("Authentication token is missing")
+        }
         return api.getStories(token = "Bearer $authToken")
     }
 
@@ -83,6 +92,7 @@ class StoryManager private constructor(
             null
         }
     }
+
 
     fun getStoriesPaging() : LiveData<PagingData<ListStoryItemLocal>> {
         @OptIn(ExperimentalPagingApi::class)

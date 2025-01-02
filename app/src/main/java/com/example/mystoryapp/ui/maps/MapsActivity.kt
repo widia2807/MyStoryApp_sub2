@@ -85,6 +85,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         try {
+            val validStories = stories.filter { it.lat != null && it.lon != null }
             if (stories.isNotEmpty()) {
                 val bounds = boundsBuilder.build()
                 mMap.animateCamera(
@@ -180,6 +181,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(dicodingSpace, 15f))
         }
         getMyLocation()
+        viewModel.getStories()
     }
 
     private val requestPermissionLauncher =

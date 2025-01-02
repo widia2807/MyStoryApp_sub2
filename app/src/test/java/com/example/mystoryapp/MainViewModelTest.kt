@@ -16,8 +16,10 @@ import androidx.paging.AsyncPagingDataDiffer
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import androidx.recyclerview.widget.ListUpdateCallback
 import com.example.mystoryapp.data.dao.ListStoriesAdapter
 import com.example.mystoryapp.data.repo.StoryManager
+import com.example.mystoryapp.data.repo.UserManager
 import com.example.mystoryapp.data.response.ListStoryItemLocal
 import com.example.mystoryapp.ui.main.main1.MainViewModel
 import kotlinx.coroutines.Dispatchers
@@ -29,9 +31,12 @@ class MainViewModelTest{
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()
     @get:Rule
-    val mainDispatcherRules = RuleDispatcher.MainDispatcherRule()
+    val mainDispatcherRules = MainDispatcherRule()
+
     @Mock
     private lateinit var storyManager: StoryManager
+    @Mock
+    private lateinit var userManager: UserManager
     @Test
     fun `when Get Story Should Not Null and Return Data`() = runTest {
         val dummyQuote = Dummy.generateDummyQuoteResponse()
@@ -40,7 +45,7 @@ class MainViewModelTest{
         expectedQuote.value = data
         Mockito.`when`(storyManager.getStoriesPaging()).thenReturn(expectedQuote)
 
-        val mainViewModel = MainViewModel(storyManager)
+        val mainViewModel = MainViewModel(userManager, storyManager)  // Berikan kedua parameter
         val actualQuote: PagingData<ListStoryItemLocal> = mainViewModel.story.getOrAwaitValue()
 
         val differ = AsyncPagingDataDiffer(
@@ -55,13 +60,22 @@ class MainViewModelTest{
         Assert.assertEquals(dummyQuote[0], differ.snapshot()[0])
     }
 
+    companion object {
+        private val noopListUpdateCallback = object : ListUpdateCallback {
+            override fun onInserted(position: Int, count: Int) {}
+            override fun onRemoved(position: Int, count: Int) {}
+            override fun onMoved(fromPosition: Int, toPosition: Int) {}
+            override fun onChanged(position: Int, count: Int, payload: Any?) {}
+        }
+    }
+
     @Test
     fun `when Get Story Empty Should Return No Data`() = runTest {
         val data: PagingData<ListStoryItemLocal> = PagingData.from(emptyList())
         val expectedQuote = MutableLiveData<PagingData<ListStoryItemLocal>>()
         expectedQuote.value = data
         Mockito.`when`(storyManager.getStoriesPaging()).thenReturn(expectedQuote)
-        val mainViewModel = MainViewModel(storyManager)
+        val mainViewModel = MainViewModel(userManager, storyManager)
         val actualQuote: PagingData<ListStoryItemLocal> = mainViewModel.story.getOrAwaitValue()
         val differ = AsyncPagingDataDiffer(
             diffCallback = ListStoriesAdapter.DIFF_CALLBACK,

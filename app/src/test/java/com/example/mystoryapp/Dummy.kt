@@ -2,7 +2,7 @@ package com.example.mystoryapp
 
 import com.example.mystoryapp.data.response.ListStoryItemLocal
 
-class Dummy {
+object Dummy {
     fun generateDummyQuoteResponse(): List<ListStoryItemLocal> {
         val items: MutableList<ListStoryItemLocal> = arrayListOf()
         for (i in 0..100) {
@@ -20,3 +20,4 @@ class Dummy {
         return items
     }
 }
+

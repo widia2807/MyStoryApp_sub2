@@ -34,7 +34,7 @@ class MapsViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val response = storyRepository.fetchAllStories()
+                val response = storyRepository.fetchStoriesWithLocation()
                 if (!response.listStory.isNullOrEmpty()) {
                     _listStories.value = response.listStory.filterNotNull()
                     Log.d("MapsViewModel", "Stories fetched successfully")
@@ -45,14 +45,12 @@ class MapsViewModel @Inject constructor(
             } catch (e: Exception) {
                 _error.value = "Error: ${e.message}"
                 Log.e("MapsViewModel", "Error fetching stories: ${e.message}")
-            } catch (e: Exception) {
-                _error.value = "Error: ${e.message}"
-                Log.e("MapsViewModel", "Error fetching stories: ${e.message}")
             } finally {
                 _isLoading.value = false
             }
         }
     }
+
 
     fun getStoriesWithFlow() {
         viewModelScope.launch {

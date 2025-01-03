@@ -9,6 +9,7 @@
     <string name="enter_your_password">     Enter Your Password\n</string>
     <string name="signup">Register</string>
     <string name="app_version">Ver 1.0.12</string>
+    <string name="check_your_connection">Cek koneksi Anda</string>
     <string name="email">Email</string>
     <string name="title_login_page">Login \n</string>
     <string name="message_login_page">Welcome To Login Pages\n</string>

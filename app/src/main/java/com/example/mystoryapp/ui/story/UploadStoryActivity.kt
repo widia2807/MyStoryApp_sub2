@@ -1,5 +1,8 @@
 package com.example.mystoryapp.ui.story
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -99,6 +102,11 @@ class UploadStoryActivity : AppCompatActivity() {
     }
 
     private fun uploadImage() {
+        if (!isOnline()) {
+            showToast(getString(R.string.check_your_connection)) // Tambahkan string ini di resource
+            return
+        }
+
         currentImageUri?.let { uri ->
             val imageFile = uriToFile(uri, this).reduceFileImage()
             Log.d("Image File", "showImage: ${imageFile.path}")
@@ -155,7 +163,12 @@ class UploadStoryActivity : AppCompatActivity() {
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
-
+    fun Context.isOnline(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
     companion object {
         private const val EXTRA_IMAGE_URI = "image_uri"
     }

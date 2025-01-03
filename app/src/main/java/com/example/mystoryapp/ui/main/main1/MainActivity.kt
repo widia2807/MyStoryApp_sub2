@@ -13,8 +13,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.map
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mystoryapp.R
+import com.example.mystoryapp.data.response.ListStoryItem
 import com.example.mystoryapp.data.retrofit.ApiConfig
 import com.example.mystoryapp.databinding.ActivityMainBinding
 import com.example.mystoryapp.ui.main.main2.ViewModelFactory
@@ -71,14 +73,26 @@ class MainActivity : AppCompatActivity() {
     private fun fetchStories() {
         lifecycleScope.launch {
             try {
-                viewModel.getStoryPager().collectLatest { pagingData ->
-                    storyAdapter.submitData(pagingData)
-                }
+                viewModel.getStoryPager()
+                    .collectLatest { pagingData ->
+                        // Mapping ListStoryItemLocal to ListStoryItem
+                        val mappedPagingData = pagingData.map { localItem ->
+                            ListStoryItem(
+                                id = localItem.id,
+                                name = localItem.name,
+                                description = localItem.description,
+                                photoUrl = localItem.photoUrl,
+                                createdAt = localItem.createdAt
+                            )
+                        }
+                        storyAdapter.submitData(mappedPagingData)
+                    }
             } catch (exception: Exception) {
                 Log.e(TAG, "Failed to fetch stories: ${exception.message}", exception)
             }
         }
     }
+
 
     private fun setupFab() {
         binding.fabAdd.setOnClickListener {

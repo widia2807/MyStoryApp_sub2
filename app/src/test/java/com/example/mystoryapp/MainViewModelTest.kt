@@ -2,7 +2,6 @@ package com.example.mystoryapp
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,6 +22,7 @@ import com.example.mystoryapp.data.repo.UserManager
 import com.example.mystoryapp.data.response.ListStoryItemLocal
 import com.example.mystoryapp.ui.main.main1.MainViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import org.junit.Assert
 
 @ExperimentalCoroutinesApi
@@ -45,8 +45,8 @@ class MainViewModelTest{
         expectedQuote.value = data
         Mockito.`when`(storyManager.getStoriesPaging()).thenReturn(expectedQuote)
 
-        val mainViewModel = MainViewModel(userManager, storyManager)  // Berikan kedua parameter
-        val actualQuote: PagingData<ListStoryItemLocal> = mainViewModel.story.getOrAwaitValue()
+        val mainViewModel = MainViewModel(userManager, storyManager)
+        val actualQuote = mainViewModel.getStoryPager().first()
 
         val differ = AsyncPagingDataDiffer(
             diffCallback = ListStoriesAdapter.DIFF_CALLBACK,
@@ -76,7 +76,7 @@ class MainViewModelTest{
         expectedQuote.value = data
         Mockito.`when`(storyManager.getStoriesPaging()).thenReturn(expectedQuote)
         val mainViewModel = MainViewModel(userManager, storyManager)
-        val actualQuote: PagingData<ListStoryItemLocal> = mainViewModel.story.getOrAwaitValue()
+        val actualQuote = mainViewModel.getStoryPager().first()
         val differ = AsyncPagingDataDiffer(
             diffCallback = ListStoriesAdapter.DIFF_CALLBACK,
             updateCallback = noopListUpdateCallback,
@@ -87,18 +87,19 @@ class MainViewModelTest{
     }
 }
 
-class QuotePagingSource : PagingSource<Int, LiveData<List<ListStoryItemLocal>>>() {
+class QuotePagingSource : PagingSource<Int, ListStoryItemLocal>() {
     companion object {
         fun snapshot(items: List<ListStoryItemLocal>): PagingData<ListStoryItemLocal> {
             return PagingData.from(items)
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, LiveData<List<ListStoryItemLocal>>>): Int {
-        return 0
+    override fun getRefreshKey(state: PagingState<Int, ListStoryItemLocal>): Int? {
+        return state.anchorPosition
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, LiveData<List<ListStoryItemLocal>>> {
-        return LoadResult.Page(emptyList(), 0, 1)
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ListStoryItemLocal> {
+        return LoadResult.Page(emptyList(), null, null)
     }
 }
+

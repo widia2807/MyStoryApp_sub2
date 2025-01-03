@@ -30,9 +30,10 @@ class MainViewModel(
         }
     }
 
-    fun getStoryPager(): Flow<PagingData<ListStoryItem>> {
+    fun getStoryPager(): Flow<PagingData<ListStoryItemLocal>> {
         return storyManager.getPaginatedStories()
     }
+
 
     suspend fun fetchStoryDetail(storyId: String): DetailStoryResponse {
         return storyManager.fetchStoryDetails(storyId)

@@ -69,15 +69,16 @@ class StoryManager private constructor(
         return api.getStoryDetail(token = "Bearer $authToken", id = storyId)
     }
 
-    fun getPaginatedStories(): Flow<PagingData<ListStoryItem>> {
+    fun getPaginatedStories(): Flow<PagingData<ListStoryItemLocal>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 20,
                 enablePlaceholders = false
             ),
-            pagingSourceFactory = { StoryDataSource(api, preferences) }
+            pagingSourceFactory = { database.storyDao().getAllStory() }
         ).flow
     }
+
     suspend fun getStoriesLocation(): StoryResponse? {
         return try {
             val session = preferences.getSession().firstOrNull()

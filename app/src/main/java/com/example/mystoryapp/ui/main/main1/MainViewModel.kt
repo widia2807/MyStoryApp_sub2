@@ -13,51 +13,41 @@ import com.example.mystoryapp.data.response.DetailStoryResponse
 import com.example.mystoryapp.data.response.ListStoryItem
 import com.example.mystoryapp.data.userpref.UserModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class MainViewModel(
     private val userManager: UserManager,
     private val storyManager: StoryManager
 ) : ViewModel() {
 
+
     fun getSession(): LiveData<UserModel> = userManager.retrieveUserSession().asLiveData()
 
     fun logout() {
         viewModelScope.launch {
-            userManager.clearSession()
-        }
-    }
-
-    fun getStoryPager(): Flow<PagingData<ListStoryItem>> {
-        return storyManager.getStoriesPaging()
-    }
-    private val _storyPager = MutableStateFlow<PagingData<ListStoryItem>>(PagingData.empty())
-    val storyPager: StateFlow<PagingData<ListStoryItem>> = _storyPager.asStateFlow()
-
-    init {
-        fetchStories()
-    }
-
-    private fun fetchStories() {
-        viewModelScope.launch {
             try {
-                storyManager.getStoriesPaging()
-                    .cachedIn(viewModelScope) // Penting untuk caching data
-                    .collect { pagingData ->
-                        _storyPager.value = pagingData
-                    }
-            } catch (exception: Exception) {
-                _isErr.value = "Failed to fetch stories: ${exception.message}"
+                userManager.clearSession()
+                Timber.d("User logged out successfully")
+            } catch (e: Exception) {
+                Timber.e(e, "Error during logout")
+                _isErr.value = "Logout failed: ${e.message}"
             }
         }
     }
 
 
+    val storyPager: Flow<PagingData<ListStoryItem>> = storyManager.getStoriesPaging()
+        .cachedIn(viewModelScope)
+
+
     suspend fun fetchStoryDetail(storyId: String): DetailStoryResponse {
-        return storyManager.fetchStoryDetails(storyId)
+        return try {
+            storyManager.fetchStoryDetails(storyId)
+        } catch (e: Exception) {
+            Timber.e(e, "Error fetching story detail for ID: $storyId")
+            throw e
+        }
     }
 
     private val _listStories = MutableLiveData<List<ListStoryItem>>()
@@ -66,6 +56,21 @@ class MainViewModel(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
+
     private val _isErr = MutableLiveData<String>()
     val isErr: LiveData<String> = _isErr
+
+    init {
+        Timber.d("MainViewModel initialized")
+    }
+
+
+    private fun updateLoadingState(isLoading: Boolean) {
+        _isLoading.value = isLoading
+    }
+
+    private fun handleError(error: Throwable) {
+        Timber.e(error, "Error in MainViewModel")
+        _isErr.value = error.message ?: "An unknown error occurred"
+    }
 }

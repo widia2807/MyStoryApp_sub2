@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels {
         ViewModelFactory.getInstance(this, ApiConfig.getApiService())
     }
+    private var logoutDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,19 +62,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Observe storyPager dari ViewModel
+        // Update this part
         lifecycleScope.launch {
             viewModel.storyPager.collectLatest { pagingData ->
-                val mappedPagingData = pagingData.map { localItem ->
-                    ListStoryItem(
-                        id = localItem.id,
-                        name = localItem.name,
-                        description = localItem.description,
-                        photoUrl = localItem.photoUrl,
-                        createdAt = localItem.createdAt
-                    )
-                }
-                storyAdapter.submitData(mappedPagingData)
+                storyAdapter.submitData(pagingData)
             }
         }
 
@@ -104,15 +96,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun animateViews() {
-        binding.rvUser.translationY = -300f
+
+        binding.rvUser.translationY = -100f
         binding.rvUser.alpha = 0f
-        binding.fabAdd.translationY = 300f
+        binding.fabAdd.translationY = 100f
         binding.fabAdd.alpha = 0f
 
-        binding.rvUser.animate().translationY(0f).alpha(1f).duration = 1000
-        binding.fabAdd.animate().translationY(0f).alpha(1f).duration = 1000
-    }
 
+        binding.rvUser.animate()
+            .translationY(0f)
+            .alpha(1f)
+            .setDuration(500)    // Dari 1000
+            .start()
+
+        binding.fabAdd.animate()
+            .translationY(0f)
+            .alpha(1f)
+            .setDuration(500)    // Dari 1000
+            .start()
+    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
@@ -134,7 +136,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showLogoutDialog() {
-        AlertDialog.Builder(this).apply {
+        logoutDialog = AlertDialog.Builder(this).apply {
             setTitle("Logout")
             setMessage("Are you sure you want to log out?")
             setPositiveButton("Yes") { dialog, _ ->
@@ -143,8 +145,14 @@ class MainActivity : AppCompatActivity() {
             }
             setNegativeButton("No") { dialog, _ -> dialog.dismiss() }
             create()
-            show()
-        }
+        }.show()
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        logoutDialog?.dismiss()
+        logoutDialog = null
     }
 
     private fun logout() {

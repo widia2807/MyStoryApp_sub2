@@ -29,8 +29,9 @@ class MainViewModel(
     }
 
     fun getStoryPager(): Flow<PagingData<ListStoryItem>> {
-        return storyManager.getStoriesPaging().cachedIn(viewModelScope)
+        return storyManager.getStoriesPaging()
     }
+
 
     suspend fun fetchStoryDetail(storyId: String): DetailStoryResponse {
         return storyManager.fetchStoryDetails(storyId)

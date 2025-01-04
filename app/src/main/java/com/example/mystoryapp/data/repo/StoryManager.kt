@@ -7,6 +7,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.liveData
+import androidx.paging.map
 import com.example.mystoryapp.data.dao.DaoStory
 import com.example.mystoryapp.data.response.DetailStoryResponse
 import com.example.mystoryapp.data.response.ListStoryItem
@@ -23,6 +24,7 @@ import dagger.hilt.android.components.ViewModelComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -96,12 +98,23 @@ class StoryManager private constructor(
     }
 
 
-    fun getStoriesPaging(): Flow<PagingData<ListStoryItemLocal>> {
+    fun getStoriesPaging(): Flow<PagingData<ListStoryItem>> {
         return Pager(
             config = PagingConfig(pageSize = 20),
             pagingSourceFactory = { database.storyDao().getAllStory() }
-        ).flow
+        ).flow.map { pagingData ->
+            pagingData.map { localItem ->
+                ListStoryItem(
+                    id = localItem.id,
+                    name = localItem.name,
+                    description = localItem.description,
+                    photoUrl = localItem.photoUrl,
+                    createdAt = localItem.createdAt
+                )
+            }
+        }
     }
+
 
     companion object {
         @Volatile

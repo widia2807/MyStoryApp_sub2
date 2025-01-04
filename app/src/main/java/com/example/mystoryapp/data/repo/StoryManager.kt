@@ -7,6 +7,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.liveData
+import com.example.mystoryapp.data.dao.DaoStory
 import com.example.mystoryapp.data.response.DetailStoryResponse
 import com.example.mystoryapp.data.response.ListStoryItem
 import com.example.mystoryapp.data.response.ListStoryItemLocal
@@ -95,17 +96,11 @@ class StoryManager private constructor(
     }
 
 
-    fun getStoriesPaging() : LiveData<PagingData<ListStoryItemLocal>> {
-        @OptIn(ExperimentalPagingApi::class)
+    fun getStoriesPaging(): Flow<PagingData<ListStoryItemLocal>> {
         return Pager(
-            config = PagingConfig(
-                pageSize = 5
-            ),
-            remoteMediator = StoryRemoteMediator(database, api, preferences),
-            pagingSourceFactory = {
-                database.storyDao().getAllStory()
-            }
-        ).liveData
+            config = PagingConfig(pageSize = 20),
+            pagingSourceFactory = { database.storyDao().getAllStory() }
+        ).flow
     }
 
     companion object {

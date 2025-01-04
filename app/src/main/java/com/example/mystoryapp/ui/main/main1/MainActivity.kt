@@ -75,7 +75,6 @@ class MainActivity : AppCompatActivity() {
             try {
                 viewModel.getStoryPager()
                     .collectLatest { pagingData ->
-                        // Mapping ListStoryItemLocal to ListStoryItem
                         val mappedPagingData = pagingData.map { localItem ->
                             ListStoryItem(
                                 id = localItem.id,

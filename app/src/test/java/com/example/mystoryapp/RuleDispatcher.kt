@@ -1,6 +1,7 @@
 package com.example.mystoryapp
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -9,13 +10,13 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
 class MainDispatcherRule : TestWatcher() {
-    private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
+    private val testDispatcher = StandardTestDispatcher()
 
-    override fun starting(description: Description) {
+    override fun starting(description: Description?) {
         Dispatchers.setMain(testDispatcher)
     }
 
-    override fun finished(description: Description) {
+    override fun finished(description: Description?) {
         Dispatchers.resetMain()
     }
 }

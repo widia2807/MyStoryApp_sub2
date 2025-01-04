@@ -57,5 +57,9 @@ class MainAdapter : PagingDataAdapter<ListStoryItem, MainAdapter.StoryViewHolder
                 return oldItem == newItem
             }
         }
+
+        fun getDiffCallback() = DIFF_CALLBACK
     }
+
+
 }

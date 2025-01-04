@@ -2,7 +2,6 @@ package com.example.mystoryapp.ui.main.main1
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
@@ -12,7 +11,6 @@ import com.example.mystoryapp.data.repo.StoryManager
 import com.example.mystoryapp.data.repo.UserManager
 import com.example.mystoryapp.data.response.DetailStoryResponse
 import com.example.mystoryapp.data.response.ListStoryItem
-import com.example.mystoryapp.data.response.ListStoryItemLocal
 import com.example.mystoryapp.data.userpref.UserModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -30,10 +28,9 @@ class MainViewModel(
         }
     }
 
-    fun getStoryPager(): Flow<PagingData<ListStoryItemLocal>> {
-        return storyManager.getPaginatedStories()
+    fun getStoryPager(): Flow<PagingData<ListStoryItem>> {
+        return storyManager.getStoriesPaging().cachedIn(viewModelScope)
     }
-
 
     suspend fun fetchStoryDetail(storyId: String): DetailStoryResponse {
         return storyManager.fetchStoryDetails(storyId)
@@ -47,6 +44,4 @@ class MainViewModel(
 
     private val _isErr = MutableLiveData<String>()
     val isErr: LiveData<String> = _isErr
-
-    var story: LiveData<PagingData<ListStoryItemLocal>> = storyManager.getStoriesPaging().cachedIn(viewModelScope)
 }

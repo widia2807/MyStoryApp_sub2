@@ -58,10 +58,34 @@ class MainActivity : AppCompatActivity() {
                 navigateToWelcome()
             } else {
                 Timber.d("Valid session found, fetching stories")
-                fetchStories()
+            }
+        }
+
+        // Observe storyPager dari ViewModel
+        lifecycleScope.launch {
+            viewModel.storyPager.collectLatest { pagingData ->
+                val mappedPagingData = pagingData.map { localItem ->
+                    ListStoryItem(
+                        id = localItem.id,
+                        name = localItem.name,
+                        description = localItem.description,
+                        photoUrl = localItem.photoUrl,
+                        createdAt = localItem.createdAt
+                    )
+                }
+                storyAdapter.submitData(mappedPagingData)
+            }
+        }
+
+        // Observe error dari ViewModel
+        viewModel.isErr.observe(this) { errorMessage ->
+            if (errorMessage.isNotEmpty()) {
+                Log.e(TAG, errorMessage)
+                showToast(errorMessage)
             }
         }
     }
+
 
     private fun setupRecyclerView() {
         binding.rvUser.apply {
@@ -70,27 +94,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun fetchStories() {
-        lifecycleScope.launch {
-            try {
-                viewModel.getStoryPager()
-                    .collectLatest { pagingData ->
-                        val mappedPagingData = pagingData.map { localItem ->
-                            ListStoryItem(
-                                id = localItem.id,
-                                name = localItem.name,
-                                description = localItem.description,
-                                photoUrl = localItem.photoUrl,
-                                createdAt = localItem.createdAt
-                            )
-                        }
-                        storyAdapter.submitData(mappedPagingData)
-                    }
-            } catch (exception: Exception) {
-                Log.e(TAG, "Failed to fetch stories: ${exception.message}", exception)
-            }
-        }
-    }
+
 
 
     private fun setupFab() {

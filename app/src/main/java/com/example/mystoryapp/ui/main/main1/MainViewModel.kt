@@ -13,6 +13,9 @@ import com.example.mystoryapp.data.response.DetailStoryResponse
 import com.example.mystoryapp.data.response.ListStoryItem
 import com.example.mystoryapp.data.userpref.UserModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel(
@@ -30,6 +33,26 @@ class MainViewModel(
 
     fun getStoryPager(): Flow<PagingData<ListStoryItem>> {
         return storyManager.getStoriesPaging()
+    }
+    private val _storyPager = MutableStateFlow<PagingData<ListStoryItem>>(PagingData.empty())
+    val storyPager: StateFlow<PagingData<ListStoryItem>> = _storyPager.asStateFlow()
+
+    init {
+        fetchStories()
+    }
+
+    private fun fetchStories() {
+        viewModelScope.launch {
+            try {
+                storyManager.getStoriesPaging()
+                    .cachedIn(viewModelScope) // Penting untuk caching data
+                    .collect { pagingData ->
+                        _storyPager.value = pagingData
+                    }
+            } catch (exception: Exception) {
+                _isErr.value = "Failed to fetch stories: ${exception.message}"
+            }
+        }
     }
 
 

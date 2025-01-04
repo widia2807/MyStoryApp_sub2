@@ -1,20 +1,15 @@
 package com.example.mystoryapp.data.repo
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.liveData
 import androidx.paging.map
-import com.example.mystoryapp.data.dao.DaoStory
 import com.example.mystoryapp.data.response.DetailStoryResponse
 import com.example.mystoryapp.data.response.ListStoryItem
 import com.example.mystoryapp.data.response.ListStoryItemLocal
 import com.example.mystoryapp.data.response.StoryResponse
 import com.example.mystoryapp.data.retrofit.ApiService
-import com.example.mystoryapp.data.retrofit.StoryRemoteMediator
 import com.example.mystoryapp.data.userpref.UserPreference
 import com.example.mystoryapp.ui.auth.NetworkResult
 import dagger.Module
@@ -29,7 +24,8 @@ import retrofit2.HttpException
 import java.io.IOException
 
 
-class StoryManager private constructor(
+// Membuat kelas StoryManager open untuk dapat dimock oleh Mockito
+open class StoryManager private constructor(
     private val api: ApiService,
     private val preferences: UserPreference,
     private val database: StoryDatabase
@@ -50,13 +46,11 @@ class StoryManager private constructor(
         }
     }
 
-
     suspend fun fetchStoriesWithLocation(): StoryResponse {
         val authToken = preferences.getSession().firstOrNull()?.token
             ?: throw IllegalStateException("Authentication token is missing")
         return api.getStories(token = "Bearer $authToken", location = 1)
     }
-
 
     suspend fun fetchAllStories(): StoryResponse {
         val authToken = preferences.getSession().firstOrNull()?.token
@@ -97,7 +91,6 @@ class StoryManager private constructor(
         }
     }
 
-
     fun getStoriesPaging(): Flow<PagingData<ListStoryItem>> {
         return Pager(
             config = PagingConfig(pageSize = 20),
@@ -114,7 +107,6 @@ class StoryManager private constructor(
             }
         }
     }
-
 
     companion object {
         @Volatile
@@ -140,5 +132,4 @@ class StoryManager private constructor(
             return StoryManager(api, preferences, database)
         }
     }
-
 }

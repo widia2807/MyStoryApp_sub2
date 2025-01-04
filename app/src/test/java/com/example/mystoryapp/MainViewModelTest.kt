@@ -33,6 +33,7 @@ class MainViewModelTest {
     @get:Rule
     val mainDispatcherRules = MainDispatcherRule()
 
+
     @Mock
     private lateinit var storyManager: StoryManager
 

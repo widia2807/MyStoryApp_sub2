@@ -1,6 +1,7 @@
 package com.example.mystoryapp.data.repo
 
 import android.util.Log
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -10,6 +11,7 @@ import com.example.mystoryapp.data.response.ListStoryItem
 import com.example.mystoryapp.data.response.ListStoryItemLocal
 import com.example.mystoryapp.data.response.StoryResponse
 import com.example.mystoryapp.data.retrofit.ApiService
+import com.example.mystoryapp.data.retrofit.StoryRemoteMediator
 import com.example.mystoryapp.data.userpref.UserPreference
 import com.example.mystoryapp.ui.auth.NetworkResult
 import dagger.Module
@@ -24,7 +26,7 @@ import retrofit2.HttpException
 import java.io.IOException
 
 
-// Membuat kelas StoryManager open untuk dapat dimock oleh Mockito
+
 open class StoryManager private constructor(
     private val api: ApiService,
     private val preferences: UserPreference,
@@ -91,10 +93,22 @@ open class StoryManager private constructor(
         }
     }
 
+    @OptIn(ExperimentalPagingApi::class)
     fun getStoriesPaging(): Flow<PagingData<ListStoryItem>> {
         return Pager(
-            config = PagingConfig(pageSize = 20),
-            pagingSourceFactory = { database.storyDao().getAllStory() }
+            config = PagingConfig(
+                pageSize = 20,
+                enablePlaceholders = false,
+                initialLoadSize = 20
+            ),
+            remoteMediator = StoryRemoteMediator(
+                database = database,
+                api = api,
+                preferences = preferences
+            ),
+            pagingSourceFactory = {
+                database.storyDao().getAllStory()
+            }
         ).flow.map { pagingData ->
             pagingData.map { localItem ->
                 ListStoryItem(
@@ -102,12 +116,13 @@ open class StoryManager private constructor(
                     name = localItem.name,
                     description = localItem.description,
                     photoUrl = localItem.photoUrl,
-                    createdAt = localItem.createdAt
+                    createdAt = localItem.createdAt,
+                    lat = localItem.lat.toDoubleOrNull(),
+                    lon = localItem.lon.toDoubleOrNull()
                 )
             }
         }
     }
-
     companion object {
         @Volatile
         private var INSTANCE: StoryManager? = null

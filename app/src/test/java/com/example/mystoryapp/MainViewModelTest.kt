@@ -50,7 +50,7 @@ class MainViewModelTest {
         Mockito.`when`(storyManager.getStoriesPaging()).thenReturn(expectedFlow)
 
         val mainViewModel = MainViewModel(userManager, storyManager)
-        val actualPagingData = mainViewModel.getStoryPager().first()
+        val actualPagingData = mainViewModel.storyPager.first()
 
         val differ = AsyncPagingDataDiffer(
             diffCallback = MainAdapter.getDiffCallback(),
@@ -74,7 +74,7 @@ class MainViewModelTest {
         Mockito.`when`(storyManager.getStoriesPaging()).thenReturn(expectedFlow)
 
         val mainViewModel = MainViewModel(userManager, storyManager)
-        val actualPagingData = mainViewModel.getStoryPager().first()
+        val actualPagingData = mainViewModel.storyPager.first()
 
         val differ = AsyncPagingDataDiffer(
             diffCallback = MainAdapter.getDiffCallback(),

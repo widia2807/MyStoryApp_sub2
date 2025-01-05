@@ -103,13 +103,12 @@ class UploadStoryActivity : AppCompatActivity() {
 
     private fun uploadImage() {
         if (!isOnline()) {
-            showToast(getString(R.string.check_your_connection)) // Tambahkan string ini di resource
+            showToast(getString(R.string.check_your_connection))
             return
         }
 
         currentImageUri?.let { uri ->
             val imageFile = uriToFile(uri, this).reduceFileImage()
-            Log.d("Image File", "showImage: ${imageFile.path}")
             val description = binding.edAddDescription.text.toString()
 
             showLoading(true)
@@ -128,12 +127,15 @@ class UploadStoryActivity : AppCompatActivity() {
                         )
 
                         val apiService = ApiConfig.getAuthenticatedApiService(token)
-                        Log.d("PhotoActivity", "Request: Sending upload request to server")
                         val successResponse = apiService.addStory(
                             token = "Bearer $token",
                             photo = multipartBody,
                             description = requestBody
                         )
+
+
+                        viewModel.refreshStories()
+
                         successResponse.message?.let {
                             showToast(it)
                             Log.d("PhotoActivity", "Response message: $it")

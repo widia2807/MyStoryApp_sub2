@@ -48,6 +48,15 @@ open class StoryManager private constructor(
         }
     }
 
+    suspend fun refreshStories() {
+        // Force RemoteMediator to refresh
+        val remoteKeys = database.remoteKeysDao().getRemoteKeysId("0")
+        if (remoteKeys != null) {
+            database.remoteKeysDao().deleteRemoteKeys()
+            database.storyDao().deleteAll()
+        }
+    }
+
     suspend fun fetchStoriesWithLocation(): StoryResponse {
         val authToken = preferences.getSession().firstOrNull()?.token
             ?: throw IllegalStateException("Authentication token is missing")

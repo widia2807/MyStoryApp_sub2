@@ -1,5 +1,6 @@
 package com.example.mystoryapp.ui.main.main1
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -35,7 +36,15 @@ class MainViewModel(
             }
         }
     }
-
+    fun refreshStories() {
+        viewModelScope.launch {
+            try {
+                storyManager.refreshStories()
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Error refreshing stories", e)
+            }
+        }
+    }
 
     val storyPager: Flow<PagingData<ListStoryItem>> = storyManager.getStoriesPaging()
         .cachedIn(viewModelScope)

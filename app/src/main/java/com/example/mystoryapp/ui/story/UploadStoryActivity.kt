@@ -115,6 +115,7 @@ class UploadStoryActivity : AppCompatActivity() {
             showLoading(true)
 
             lifecycleScope.launch {
+                Log.d("MainViewModel", "Coroutine started")
                 try {
                     val token = userPreference.getSession().first().token
 
@@ -154,6 +155,7 @@ class UploadStoryActivity : AppCompatActivity() {
                         Log.e("PhotoActivity", "Error message: $it")
                     }
                 } finally {
+                    Log.d("MainViewModel", "Coroutine was cancelled")
                     showLoading(false)
                 }
             }

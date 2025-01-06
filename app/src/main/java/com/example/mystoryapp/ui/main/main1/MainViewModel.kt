@@ -43,17 +43,14 @@ class MainViewModel(
         }
     }
     fun refreshStories() {
-        viewModelScope.launch(SupervisorJob() + Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 Log.d("MainViewModel", "Calling refresh stories")
                 storyManager.refreshStories()
-                Log.d("MainViewModel", "Story refresh completed")
                 _needRefresh.postValue(true)
-                storyPager.collectLatest {
-                    Log.d("MainViewModel", "New paging data received")
-                }
             } catch (e: Exception) {
                 Log.e("MainViewModel", "Error refreshing stories", e)
+                _isErr.postValue("Error refreshing stories: ${e.message}")
             }
         }
     }

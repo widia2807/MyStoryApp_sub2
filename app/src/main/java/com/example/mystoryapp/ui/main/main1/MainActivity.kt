@@ -6,12 +6,9 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.map
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -48,40 +45,34 @@ class MainActivity : AppCompatActivity() {
         animateViews()
     }
 
+    override fun onResume() {
+        super.onResume()
+        storyAdapter.refresh()
+    }
 
     private fun setupObservers() {
-        Timber.d("Setting up observers in MainActivity")
         viewModel.getSession().observe(this) { user ->
-            Timber.d("Session state in MainActivity: isLogin=${user.isLogin}, tokenBlank=${user.token.isBlank()}")
             if (!user.isLogin && user.token.isBlank()) {
-                Timber.d("No valid session found, navigating to Welcome")
                 navigateToWelcome()
-            } else {
-                Timber.d("Valid session found, fetching stories")
             }
         }
-
 
         lifecycleScope.launch {
             viewModel.storyPager.collectLatest { pagingData ->
-                val mappedPagingData = pagingData.map { localItem ->
-                    ListStoryItem(
-                        id = localItem.id,
-                        name = localItem.name,
-                        description = localItem.description,
-                        photoUrl = localItem.photoUrl,
-                        createdAt = localItem.createdAt
-                    )
-                }
-                storyAdapter.submitData(mappedPagingData)
+                Log.d("MainActivity", "Submitting new paging data to adapter")
+                storyAdapter.submitData(pagingData)
             }
         }
 
-        // Observe error dari ViewModel
         viewModel.isErr.observe(this) { errorMessage ->
             if (errorMessage.isNotEmpty()) {
-                Log.e(TAG, errorMessage)
                 showToast(errorMessage)
+            }
+        }
+
+        viewModel.needRefresh.observe(this) { needRefresh ->
+            if (needRefresh) {
+                storyAdapter.refresh()
             }
         }
     }
@@ -94,7 +85,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == UPLOAD_RESULT_CODE && resultCode == RESULT_OK) {
+            Log.d("MainActivity", "Upload successful, refreshing stories")
+            lifecycleScope.launch {
+                viewModel.refreshStories()
+                storyAdapter.refresh()
+            }
+        }
+    }
 
 
     private fun setupFab() {
@@ -170,6 +170,7 @@ class MainActivity : AppCompatActivity() {
 
 
     companion object {
+        private const val UPLOAD_RESULT_CODE = 100
         private const val TAG = "MainActivity"
     }
 }

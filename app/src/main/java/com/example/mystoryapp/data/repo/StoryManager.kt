@@ -49,7 +49,7 @@ open class StoryManager private constructor(
     }
 
     suspend fun refreshStories() {
-        // Force RemoteMediator to refresh
+        Log.d("StoryManager", "Starting story refresh")
         val remoteKeys = database.remoteKeysDao().getRemoteKeysId("0")
         if (remoteKeys != null) {
             database.remoteKeysDao().deleteRemoteKeys()

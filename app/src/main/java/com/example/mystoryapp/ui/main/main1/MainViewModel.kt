@@ -13,15 +13,21 @@ import com.example.mystoryapp.data.repo.UserManager
 import com.example.mystoryapp.data.response.DetailStoryResponse
 import com.example.mystoryapp.data.response.ListStoryItem
 import com.example.mystoryapp.data.userpref.UserModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.coroutines.cancellation.CancellationException
 
 class MainViewModel(
     private val userManager: UserManager,
     private val storyManager: StoryManager
 ) : ViewModel() {
 
+    private val _needRefresh = MutableLiveData<Boolean>()
+    val needRefresh: LiveData<Boolean> = _needRefresh
 
     fun getSession(): LiveData<UserModel> = userManager.retrieveUserSession().asLiveData()
 
@@ -37,14 +43,21 @@ class MainViewModel(
         }
     }
     fun refreshStories() {
-        viewModelScope.launch {
+        viewModelScope.launch(SupervisorJob() + Dispatchers.IO) {
             try {
+                Log.d("MainViewModel", "Calling refresh stories")
                 storyManager.refreshStories()
+                Log.d("MainViewModel", "Story refresh completed")
+                _needRefresh.postValue(true)
+                storyPager.collectLatest {
+                    Log.d("MainViewModel", "New paging data received")
+                }
             } catch (e: Exception) {
                 Log.e("MainViewModel", "Error refreshing stories", e)
             }
         }
     }
+
 
     val storyPager: Flow<PagingData<ListStoryItem>> = storyManager.getStoriesPaging()
         .cachedIn(viewModelScope)

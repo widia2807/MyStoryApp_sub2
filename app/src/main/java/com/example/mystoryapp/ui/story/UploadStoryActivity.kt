@@ -23,6 +23,7 @@ import com.example.mystoryapp.ui.main.main1.MainViewModel
 import com.example.mystoryapp.ui.main.main2.ViewModelFactory
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -133,18 +134,19 @@ class UploadStoryActivity : AppCompatActivity() {
                             description = requestBody
                         )
 
-
                         viewModel.refreshStories()
-
+                        Log.d("UploadStoryActivity", "Story uploaded and refresh triggered")
                         successResponse.message?.let {
                             showToast(it)
                             Log.d("PhotoActivity", "Response message: $it")
                         }
+                        setResult(RESULT_OK)
                         finish()
                     } else {
                         showToast(getString(R.string.empty_image_warning))
                     }
                 } catch (e: HttpException) {
+                    Log.e("UploadStoryActivity", "Upload failed", e)
                     val errorBody = e.response()?.errorBody()?.string()
                     val errorResponse = Gson().fromJson(errorBody, AddResponse::class.java)
                     errorResponse.message?.let {
